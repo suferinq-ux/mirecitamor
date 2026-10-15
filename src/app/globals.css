@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1200px 700px at 85% -10%, rgba(192, 132, 252, 0.18), transparent 60%),
+    radial-gradient(900px 600px at -10% 30%, rgba(255, 107, 157, 0.16), transparent 60%),
+    radial-gradient(700px 500px at 50% 110%, rgba(251, 113, 133, 0.12), transparent 60%),
+    #0d0217;
+  background-attachment: fixed;
+}
+
+::selection {
+  background: rgba(255, 107, 157, 0.45);
+  color: #fff;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 107, 157, 0.5) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 107, 157, 0.45);
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@layer components {
+  .glass {
+    @apply rounded-3xl border border-white/10 bg-white/[0.06] backdrop-blur-xl;
+  }
+  .glass-strong {
+    @apply rounded-3xl border border-white/15 bg-night-800/70 backdrop-blur-2xl;
+  }
+  .text-grad {
+    background: linear-gradient(100deg, #ff8fb1, #ffd3a1 45%, #c084fc 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .btn-love {
+    @apply relative inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-semibold text-white transition
+      bg-gradient-to-r from-rose-500 via-pink-500 to-fuchsia-500 bg-[length:200%_100%]
+      hover:bg-[position:100%_0] hover:shadow-glow active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border bg-gradient-to-r px-3 py-1 text-xs font-semibold backdrop-blur;
+  }
+  .input-love {
+    @apply w-full rounded-2xl border border-white/15 bg-white/[0.07] px-5 py-3.5 text-rose-50 placeholder-rose-200/40
+      outline-none transition focus:border-rose-300/60 focus:bg-white/[0.1] focus:shadow-glow-sm;
+  }
+}
+
+/* Pétalos / corazones cayendo (CSS puro, liviano) */
+.petal {
+  position: fixed;
+  top: -6vh;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+  animation-name: fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 107, 157, 0.4));
+}
