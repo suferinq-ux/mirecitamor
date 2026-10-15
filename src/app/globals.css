@@ -11,6 +11,15 @@ body {
   min-height: 100%;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
 body {
   background:
     radial-gradient(1200px 700px at 85% -10%, rgba(192, 132, 252, 0.18), transparent 60%),
@@ -79,4 +88,36 @@ body {
   animation-timing-function: linear;
   animation-iteration-count: infinite;
   filter: drop-shadow(0 0 6px rgba(255, 107, 157, 0.4));
+}
+
+/* Destello que barre la tarjeta al pasar el mouse */
+.shine {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.shine::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -80%;
+  height: 100%;
+  width: 55%;
+  transform: skewX(-20deg);
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.16), transparent);
+  transition: left 0.7s ease;
+}
+.group:hover .shine::after {
+  left: 130%;
+}
+
+/* Resaltado de coincidencias del buscador */
+mark {
+  background: rgba(255, 107, 157, 0.45);
+  color: #fff;
+  border-radius: 4px;
+  padding: 0 2px;
 }

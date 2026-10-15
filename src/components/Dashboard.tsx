@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Scene3D from "./Scene3D";
 import Petals from "./Petals";
@@ -13,12 +13,31 @@ const fmtDate = (iso: string) =>
     new Date(iso)
   );
 
+/** Normaliza para buscar sin importar acentos ni mayúsculas. */
+const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
+
+/** Resalta la coincidencia del buscador dentro del texto. */
+function highlight(text: string, q: string): ReactNode {
+  const nq = norm(q.trim());
+  if (!nq) return text;
+  const i = norm(text).indexOf(nq);
+  if (i < 0) return text;
+  const len = q.trim().length;
+  return (
+    <>
+      {text.slice(0, i)}
+      <mark>{text.slice(i, i + len)}</mark>
+      {text.slice(i + len)}
+    </>
+  );
+}
+
 /* ─────────────────────────── Anillo de progreso ─────────────────────────── */
 function ProgressRing({ done }: { done: number }) {
   const R = 62;
   const C = 2 * Math.PI * R;
   return (
-    <div className="relative h-40 w-40 shrink-0">
+    <div className="relative h-36 w-36 shrink-0 sm:h-40 sm:w-40">
       <svg viewBox="0 0 150 150" className="h-full w-full -rotate-90">
         <defs>
           <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
@@ -90,49 +109,69 @@ function DateCardView({
   d,
   done,
   index,
+  q,
   onOpen
 }: {
   d: DateIdea;
   done: boolean;
   index: number;
+  q: string;
   onOpen: () => void;
 }) {
   const cat = CATEGORIES[d.cat];
   return (
     <motion.button
       layout
-      initial={{ opacity: 0, y: 26 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 26, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, scale: 0.94 }}
-      transition={{ duration: 0.4, delay: Math.min(index * 0.015, 0.4) }}
-      whileHover={{ y: -6, scale: 1.02, rotate: -0.7 }}
-      whileTap={{ scale: 0.97 }}
+      transition={{ duration: 0.4, delay: Math.min(index * 0.012, 0.35) }}
+      whileHover={{ y: -8, scale: 1.02 }}
+      whileTap={{ scale: 0.96 }}
       onClick={onOpen}
-      className={`group relative overflow-hidden rounded-3xl border p-5 text-left backdrop-blur-xl transition-colors ${
-        done
-          ? "border-rose-300/40 bg-rose-400/10"
-          : "border-white/10 bg-white/[0.05] hover:border-rose-200/30 hover:bg-white/[0.08]"
+      className={`group relative overflow-hidden rounded-[1.75rem] border p-5 text-left backdrop-blur-xl transition-colors duration-300 ${
+        done ? "border-rose-300/50" : "border-white/10 hover:border-rose-200/40"
       } ${d.special ? "ring-1 ring-amber-300/60 shadow-[0_0_35px_rgba(251,191,36,0.22)]" : ""}`}
     >
+      <div
+        className={`absolute inset-0 bg-gradient-to-br ${cat.tint} opacity-80 transition-opacity duration-300 group-hover:opacity-100`}
+      />
+      <span className="shine" aria-hidden />
       {done && (
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-rose-500/10 via-transparent to-fuchsia-500/10" />
       )}
-      <div className="flex items-start justify-between">
-        <span className="font-display text-xs tracking-[0.2em] text-rose-100/40">#{pad(d.id)}</span>
-        <span className={`text-lg transition ${done ? "animate-beat" : "opacity-30 group-hover:opacity-70"}`}>
-          {done ? "❤️" : "🤍"}
-        </span>
-      </div>
-      <span className="mt-3 block text-4xl transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-125">
-        {d.emoji}
-      </span>
-      <h3 className="mt-3 font-semibold leading-snug text-rose-50">{d.title}</h3>
-      <p className="mt-1 line-clamp-2 text-sm text-rose-100/60">{d.tip}</p>
-      <div className="mt-3 flex items-center justify-between gap-2">
-        <span className={`chip ${cat.chip}`}>
-          {cat.emoji} {cat.label}
-        </span>
-        {d.special && <span className="text-[10px] font-bold tracking-wider text-amber-200">✨ CITA MÁGICA</span>}
+
+      <div className="relative z-10">
+        <div className="flex items-start justify-between">
+          <span className="flex h-8 min-w-8 items-center justify-center rounded-full border border-white/15 bg-white/10 px-2 font-display text-[11px] tracking-widest text-rose-100/80">
+            {pad(d.id)}
+          </span>
+          <span className={`text-lg transition ${done ? "animate-beat" : "opacity-35 group-hover:opacity-70"}`}>
+            {done ? "❤️" : "🤍"}
+          </span>
+        </div>
+
+        <div className="mt-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-4xl shadow-inner transition-all duration-300 group-hover:-rotate-6 group-hover:scale-110 group-hover:shadow-glow-sm">
+          {d.emoji}
+        </div>
+
+        <h3 className="mt-3 font-display text-lg leading-snug text-rose-50">{highlight(d.title, q)}</h3>
+        <p className="mt-1.5 line-clamp-2 text-sm italic leading-relaxed text-rose-100/65">
+          “{highlight(d.tip, q)}”
+        </p>
+
+        <div className="mt-4 flex items-center justify-between gap-2">
+          <span className={`chip ${cat.chip}`}>
+            {cat.emoji} {cat.label}
+          </span>
+          {done ? (
+            <span className="-rotate-3 rounded-md border-2 border-rose-300/60 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-rose-200">
+              Vivida ✓
+            </span>
+          ) : d.special ? (
+            <span className="animate-pulse text-[10px] font-bold tracking-wider text-amber-200">✨ CITA MÁGICA</span>
+          ) : null}
+        </div>
       </div>
     </motion.button>
   );
@@ -163,7 +202,7 @@ function DateModal({
         animate={{ scale: 1, y: 0, opacity: 1, rotateX: 0 }}
         exit={{ scale: 0.9, y: 30, opacity: 0 }}
         transition={{ type: "spring", stiffness: 260, damping: 24 }}
-        className="glass-strong relative w-full max-w-lg overflow-hidden p-8 shadow-glow"
+        className="glass-strong relative w-full max-w-lg overflow-hidden p-6 shadow-glow sm:p-8"
       >
         <div className="flex items-start justify-between">
           <span className="font-display text-xs tracking-[0.25em] text-rose-100/40">CITA #{pad(d.id)}</span>
@@ -173,11 +212,11 @@ function DateModal({
         <motion.div
           animate={{ y: [0, -12, 0], rotate: [0, -4, 4, 0] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="mt-4 text-center text-7xl drop-shadow-[0_0_30px_rgba(255,107,157,0.6)]"
+          className="mt-4 text-center text-6xl drop-shadow-[0_0_30px_rgba(255,107,157,0.6)] sm:text-7xl"
         >
           {d.emoji}
         </motion.div>
-        <h2 className="mt-4 text-center font-display text-3xl text-rose-50">{d.title}</h2>
+        <h2 className="mt-4 text-center font-display text-2xl text-rose-50 sm:text-3xl">{d.title}</h2>
         <p className="mt-2 text-center italic leading-relaxed text-rose-100/70">“{d.tip}”</p>
 
         <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
@@ -258,7 +297,7 @@ function RandomModal({
         animate={{ scale: 1, y: 0, opacity: 1 }}
         exit={{ scale: 0.9, y: 30, opacity: 0 }}
         transition={{ type: "spring", stiffness: 260, damping: 24 }}
-        className="glass-strong relative w-full max-w-md overflow-hidden p-8 text-center shadow-glow"
+        className="glass-strong relative w-full max-w-md overflow-hidden p-6 text-center shadow-glow sm:p-8"
       >
         <p className="font-script text-3xl text-grad">El destino dice…</p>
 
@@ -320,6 +359,7 @@ export default function Dashboard({ userName, names, anniversary }: Props) {
   const [mounted, setMounted] = useState(false);
   const [status, setStatus] = useState<"todas" | "pendientes" | "vividas">("todas");
   const [cat, setCat] = useState<"todas" | Category>("todas");
+  const [q, setQ] = useState("");
   const [selected, setSelected] = useState<DateIdea | null>(null);
   const [randomOpen, setRandomOpen] = useState(false);
   const [burst, setBurst] = useState(0);
@@ -361,6 +401,10 @@ export default function Dashboard({ userName, names, anniversary }: Props) {
     if (status === "vividas" && !done) return false;
     if (status === "pendientes" && done) return false;
     if (cat !== "todas" && d.cat !== cat) return false;
+    if (q.trim()) {
+      const hay = norm(`${d.id} ${d.title} ${d.tip} ${CATEGORIES[d.cat].label}`);
+      if (!hay.includes(norm(q.trim()))) return false;
+    }
     return true;
   });
 
@@ -390,7 +434,7 @@ export default function Dashboard({ userName, names, anniversary }: Props) {
 
       <header className="sticky top-0 z-30 border-b border-white/5 bg-night-900/70 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-8">
-          <span className="font-script text-2xl text-grad">Nuestras 100 citas</span>
+          <span className="font-script text-xl text-grad sm:text-2xl">Nuestras 100 citas</span>
           <div className="flex items-center gap-3">
             <span className="hidden text-sm text-rose-100/70 sm:block">
               {names[0]} <span className="text-rose-400">❤</span> {names[1]}
@@ -411,14 +455,14 @@ export default function Dashboard({ userName, names, anniversary }: Props) {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="glass mt-8 flex flex-col items-center gap-8 p-8 md:flex-row md:p-10"
+          className="glass mt-6 flex flex-col items-center gap-6 p-6 sm:mt-8 sm:p-8 md:flex-row md:gap-10 md:p-10"
         >
           <ProgressRing done={doneCount} />
           <div className="flex-1 text-center md:text-left">
-            <p className="font-script text-3xl text-grad">
+            <p className="font-script text-2xl text-grad sm:text-3xl">
               {names[0]} & {names[1]}
             </p>
-            <h1 className="mt-1 font-display text-4xl leading-tight text-rose-50 sm:text-5xl">
+            <h1 className="mt-1 font-display text-3xl leading-tight text-rose-50 sm:text-5xl">
               Nuestro universo de citas
             </h1>
             <p className="mt-3 leading-relaxed text-rose-100/70">
@@ -441,51 +485,86 @@ export default function Dashboard({ userName, names, anniversary }: Props) {
           </div>
         </motion.section>
 
-        {/* Filtros */}
-        <div className="mt-8 flex flex-wrap items-center gap-2">
-          {(["todas", "pendientes", "vividas"] as const).map((s) => (
+        {/* Buscador y filtros */}
+        <div className="mt-6 space-y-4 sm:mt-8">
+          <div className="glass flex items-center gap-3 rounded-full px-5 py-3 transition focus-within:border-rose-300/50 focus-within:shadow-glow-sm">
+            <span aria-hidden className="text-lg">🔍</span>
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Busca un antojo… “playa”, “pizza”, “plastilina”"
+              className="w-full bg-transparent text-base text-rose-50 placeholder-rose-200/40 outline-none"
+            />
+            {q && (
+              <button
+                onClick={() => setQ("")}
+                aria-label="Limpiar búsqueda"
+                className="text-rose-100/60 transition hover:text-rose-50"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible">
+            {(["todas", "pendientes", "vividas"] as const).map((s) => (
+              <button
+                key={s}
+                onClick={() => setStatus(s)}
+                className={`shrink-0 rounded-full px-4 py-1.5 text-sm transition ${
+                  status === s
+                    ? "bg-gradient-to-r from-rose-500 to-fuchsia-500 text-white shadow-glow-sm"
+                    : "border border-white/10 text-rose-100/70 hover:bg-white/10"
+                }`}
+              >
+                {s === "todas" ? "💫 Todas" : s === "pendientes" ? "🤍 Pendientes" : "❤️ Vividas"}
+              </button>
+            ))}
+            <span className="mx-1 hidden h-5 w-px shrink-0 bg-white/15 sm:block" />
             <button
-              key={s}
-              onClick={() => setStatus(s)}
-              className={`rounded-full px-4 py-1.5 text-sm capitalize transition ${
-                status === s
-                  ? "bg-gradient-to-r from-rose-500 to-fuchsia-500 text-white shadow-glow-sm"
-                  : "border border-white/10 text-rose-100/70 hover:bg-white/10"
+              onClick={() => setCat("todas")}
+              className={`shrink-0 rounded-full px-3 py-1.5 text-sm transition ${
+                cat === "todas" ? "bg-white/20 text-white" : "text-rose-100/60 hover:bg-white/10"
               }`}
             >
-              {s}
+              ✨ Todo
             </button>
-          ))}
-          <span className="mx-1 hidden h-5 w-px bg-white/15 sm:block" />
-          <button
-            onClick={() => setCat("todas")}
-            className={`rounded-full px-3 py-1.5 text-sm transition ${
-              cat === "todas" ? "bg-white/20 text-white" : "text-rose-100/60 hover:bg-white/10"
-            }`}
-          >
-            ✨ Todo
-          </button>
-          {(Object.keys(CATEGORIES) as Category[]).map((c) => (
-            <button
-              key={c}
-              onClick={() => setCat(c)}
-              className={`rounded-full px-3 py-1.5 text-sm transition ${
-                cat === c ? "bg-white/20 text-white" : "text-rose-100/60 hover:bg-white/10"
-              }`}
-            >
-              {CATEGORIES[c].emoji} {CATEGORIES[c].label}
-            </button>
-          ))}
+            {(Object.keys(CATEGORIES) as Category[]).map((c) => (
+              <button
+                key={c}
+                onClick={() => setCat(c)}
+                className={`shrink-0 rounded-full px-3 py-1.5 text-sm transition ${
+                  cat === c ? "bg-white/20 text-white" : "text-rose-100/60 hover:bg-white/10"
+                }`}
+              >
+                {CATEGORIES[c].emoji} {CATEGORIES[c].label}
+                <span className="ml-1 text-[10px] opacity-60">
+                  {DATES.filter((d) => d.cat === c).length}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          <p className="text-xs text-rose-100/50">
+            {list.length} {list.length === 1 ? "cita encontrada" : "citas encontradas"}
+            {q.trim() && (
+              <>
+                {" "}para “<span className="text-rose-200">{q.trim()}</span>”
+              </>
+            )}{" "}
+            · toca una tarjeta para abrirla 💌
+          </p>
         </div>
 
         {/* Grid de citas */}
-        <motion.div layout className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <motion.div layout className="mt-6 grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
           <AnimatePresence mode="popLayout">
             {list.map((d, i) => (
               <DateCardView
                 key={d.id}
                 d={d}
                 index={i}
+                q={q}
                 done={!!progress[d.id]}
                 onOpen={() => setSelected(d)}
               />
@@ -493,15 +572,29 @@ export default function Dashboard({ userName, names, anniversary }: Props) {
           </AnimatePresence>
         </motion.div>
         {list.length === 0 && (
-          <p className="mt-16 text-center text-rose-100/60">
-            Nada por aquí… ¡vivan más citas, tortolitos! 🕊️
-          </p>
+          <div className="mt-16 flex flex-col items-center gap-3 text-center">
+            <span className="animate-floaty text-6xl">🥺</span>
+            <p className="font-script text-3xl text-grad sm:text-4xl">No encontré nada, mi amor…</p>
+            <p className="max-w-xs text-sm text-rose-100/60">
+              Prueba con otra palabra, o limpia la búsqueda y los filtros para ver las 100 otra vez.
+            </p>
+            <button
+              onClick={() => {
+                setQ("");
+                setCat("todas");
+                setStatus("todas");
+              }}
+              className="btn-love mt-2"
+            >
+              Limpiar todo ✨
+            </button>
+          </div>
         )}
 
         {/* Momentos vividos */}
         {moments.length > 0 && (
           <section className="mt-16">
-            <h2 className="font-script text-4xl text-grad">Nuestros momentos vividos</h2>
+            <h2 className="font-script text-3xl text-grad sm:text-4xl">Nuestros momentos vividos</h2>
             <div className="mt-4 flex gap-3 overflow-x-auto pb-4">
               {moments.map(({ d, e }) => (
                 <button

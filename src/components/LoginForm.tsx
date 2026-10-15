@@ -83,7 +83,7 @@ export default function LoginForm({ names, devMode }: Props) {
           💞
         </motion.div>
 
-        <h1 className="font-script text-center text-5xl text-grad">
+        <h1 className="font-script text-center text-4xl text-grad sm:text-5xl">
           Nuestro universo secreto
         </h1>
         <p className="mt-3 text-center text-sm leading-relaxed text-rose-100/70">

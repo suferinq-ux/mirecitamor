@@ -17,37 +17,43 @@ export interface DateIdea {
 
 export const CATEGORIES: Record<
   Category,
-  { label: string; emoji: string; chip: string }
+  { label: string; emoji: string; chip: string; tint: string }
 > = {
   aventura: {
     label: "Aventura",
     emoji: "🧭",
-    chip: "from-amber-400/20 to-orange-500/20 text-amber-200 border-amber-300/30"
+    chip: "from-amber-400/20 to-orange-500/20 text-amber-200 border-amber-300/30",
+    tint: "from-amber-500/15 via-orange-500/5 to-transparent"
   },
   casa: {
     label: "En casa",
     emoji: "🏠",
-    chip: "from-sky-400/20 to-indigo-500/20 text-sky-200 border-sky-300/30"
+    chip: "from-sky-400/20 to-indigo-500/20 text-sky-200 border-sky-300/30",
+    tint: "from-sky-500/15 via-indigo-500/5 to-transparent"
   },
   comida: {
     label: "Antojos",
     emoji: "🍓",
-    chip: "from-rose-400/20 to-pink-500/20 text-rose-200 border-rose-300/30"
+    chip: "from-rose-400/20 to-pink-500/20 text-rose-200 border-rose-300/30",
+    tint: "from-rose-500/15 via-pink-500/5 to-transparent"
   },
   cultura: {
     label: "Cultura",
     emoji: "🎭",
-    chip: "from-violet-400/20 to-purple-500/20 text-violet-200 border-violet-300/30"
+    chip: "from-violet-400/20 to-purple-500/20 text-violet-200 border-violet-300/30",
+    tint: "from-violet-500/15 via-purple-500/5 to-transparent"
   },
   naturaleza: {
     label: "Naturaleza",
     emoji: "🌿",
-    chip: "from-emerald-400/20 to-teal-500/20 text-emerald-200 border-emerald-300/30"
+    chip: "from-emerald-400/20 to-teal-500/20 text-emerald-200 border-emerald-300/30",
+    tint: "from-emerald-500/15 via-teal-500/5 to-transparent"
   },
   especial: {
     label: "Especiales",
     emoji: "💖",
-    chip: "from-fuchsia-400/20 to-rose-500/20 text-fuchsia-200 border-fuchsia-300/30"
+    chip: "from-fuchsia-400/20 to-rose-500/20 text-fuchsia-200 border-fuchsia-300/30",
+    tint: "from-fuchsia-500/15 via-rose-500/5 to-transparent"
   }
 };
 

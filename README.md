@@ -12,6 +12,8 @@ vivieron, escriben notas secretas y dejan que el destino elija la siguiente aven
   sesión firmada con HMAC-SHA256 en cookie `httpOnly`.
 - 💯 **Las 100 citas** de su lista, con emoji, categoría y un tip romántico cada una.
   La cita **#100 es la cita mágica de plastilina** ✨.
+- 🔍 **Buscador instantáneo** (ignora acentos y mayúsculas) con resaltado de coincidencias,
+  filtros por estado y categoría con contadores, y diseño 100% responsive para celulares.
 - 🫀 **Animaciones 3D** — corazones extruidos en Three.js (react-three-fiber) que laten y flotan,
   partículas, pétalos cayendo, explosiones de corazones al completar citas.
 - 💫 **Ruleta "Sorpréndeme"** — el destino elige la próxima cita entre las pendientes.
