@@ -40,7 +40,7 @@ npm run dev
 
 Con el `.env.local` incluido puedes entrar de inmediato:
 
-- Cuentas: **Mi Amor** / **Mi Vida** (cambia los nombres en el `.env.local`)
+- Cuentas: **José** / **Mireya** (ya configuradas en el `.env.local`)
 - Contraseña demo de ambas: `amor123`
 
 > En producción ese aviso demo desaparece solo.

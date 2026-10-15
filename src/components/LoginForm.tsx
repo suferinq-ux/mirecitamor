@@ -91,7 +91,19 @@ export default function LoginForm({ names, devMode }: Props) {
           <br />y las tenemos tú y yo.
         </p>
 
-        <div className="mt-8 grid grid-cols-2 gap-4">
+        <div className="mt-5 flex items-center justify-center gap-4 font-script text-4xl">
+          <span className="text-grad">{names[0].trim().charAt(0) || "J"}</span>
+          <motion.span
+            className="text-rose-400"
+            animate={{ scale: [1, 1.25, 1] }}
+            transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+          >
+            ♥
+          </motion.span>
+          <span className="text-grad">{names[1].trim().charAt(0) || "M"}</span>
+        </div>
+
+        <div className="mt-6 grid grid-cols-2 gap-4">
           {names.map((name, i) => {
             const idx = (i + 1) as 1 | 2;
             const active = sel === idx;

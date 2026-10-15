@@ -18,10 +18,12 @@ const body = Nunito({
   display: "swap"
 });
 
+const n1 = process.env.NEXT_PUBLIC_NAME_1 || "Mi Amor";
+const n2 = process.env.NEXT_PUBLIC_NAME_2 || "Mi Vida";
+
 export const metadata: Metadata = {
-  title: "Nuestro Universo · 100 Citas",
-  description:
-    "Un rincón secreto del internet que solo existe para dos personas: nuestras 100 citas.",
+  title: `${n1} ❤ ${n2} · Nuestro Universo`,
+  description: `El rincón más secreto del internet: solo existe para ${n1} y ${n2} y sus 100 citas.`,
   robots: { index: false, follow: false }
 };
 

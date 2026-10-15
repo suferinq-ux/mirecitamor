@@ -523,6 +523,9 @@ export default function Dashboard({ userName, names, anniversary }: Props) {
 
         <footer className="mt-20 text-center text-xs text-rose-100/40">
           Hecho con amor infinito, solo para {names[0]} y {names[1]} · {new Date().getFullYear()} 💞
+          <span className="mt-2 block font-script text-lg text-rose-200/60">
+            Hecho a mano por {names[0]}, porque {names[1]} se merece el universo entero. 💌
+          </span>
         </footer>
       </main>
 
