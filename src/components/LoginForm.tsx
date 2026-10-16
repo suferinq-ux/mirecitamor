@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Scene3D from "./Scene3D";
 import Petals from "./Petals";
+import { Micro, Spinner } from "./ui";
 
 interface Props {
   names: [string, string];
@@ -33,7 +34,7 @@ export default function LoginForm({ names, devMode }: Props) {
     e.preventDefault();
     if (locked || loading) return;
     if (!sel) {
-      setErr("Primero elige quién eres, corazón. 💭");
+      setErr("Elige quién eres.");
       return;
     }
     setLoading(true);
@@ -49,148 +50,115 @@ export default function LoginForm({ names, devMode }: Props) {
         return;
       }
       const data = (await res.json().catch(() => null)) as { error?: string } | null;
-      const nextFails = fails + 1;
-      setFails(nextFails);
-      setErr(data?.error ?? "Algo salió mal, mi amor.");
-      if (nextFails >= 5) {
+      const next = fails + 1;
+      setFails(next);
+      setErr(data?.error ?? "No se pudo entrar.");
+      if (next >= 5) {
         setLockUntil(Date.now() + 60_000);
         setNow(Date.now());
       }
     } catch {
-      setErr("No pude conectar con nuestro universo. Intenta de nuevo.");
+      setErr("Sin conexión con nuestro universo.");
     } finally {
       setLoading(false);
     }
   }
 
+  const initials = `${names[0].trim().charAt(0)}${names[1].trim().charAt(0)}`;
+
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-4">
       <Scene3D variant="login" />
-      <Petals count={16} />
+      <Petals count={7} />
 
       <motion.div
-        initial={{ opacity: 0, y: 36, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="glass-strong relative z-10 w-full max-w-md p-8 shadow-glow sm:p-10"
+        initial={{ opacity: 0, y: 28 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        className="panel-strong relative z-10 w-full max-w-sm p-8 sm:p-10"
       >
-        <motion.div
-          aria-hidden
-          className="mx-auto -mt-16 mb-4 w-fit text-6xl drop-shadow-[0_0_25px_rgba(255,107,157,0.8)]"
-          animate={{ scale: [1, 1.12, 0.98, 1.08, 1] }}
-          transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-        >
-          💞
-        </motion.div>
-
-        <h1 className="font-script text-center text-4xl text-grad sm:text-5xl">
-          Nuestro universo secreto
-        </h1>
-        <p className="mt-3 text-center text-sm leading-relaxed text-rose-100/70">
-          En todo el internet, solo existen dos llaves para entrar aquí…
-          <br />y las tenemos tú y yo.
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-blush-400/40 font-script text-lg text-blush-200">
+          {initials}
+        </div>
+        <Micro className="mt-5 block text-center">Acceso privado</Micro>
+        <h1 className="mt-2 text-center font-display text-3xl text-blush-50">Nuestro universo</h1>
+        <p className="mt-2 text-center text-xs leading-relaxed text-blush-200/60">
+          Dos personas en el mundo tienen esta llave.
         </p>
 
-        <div className="mt-5 flex items-center justify-center gap-4 font-script text-4xl">
-          <span className="text-grad">{names[0].trim().charAt(0) || "J"}</span>
-          <motion.span
-            className="text-rose-400"
-            animate={{ scale: [1, 1.25, 1] }}
-            transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
-          >
-            ♥
-          </motion.span>
-          <span className="text-grad">{names[1].trim().charAt(0) || "M"}</span>
-        </div>
-
-        <div className="mt-6 grid grid-cols-2 gap-4">
+        <div className="mt-8 space-y-2">
           {names.map((name, i) => {
             const idx = (i + 1) as 1 | 2;
             const active = sel === idx;
             return (
-              <motion.button
+              <button
                 key={idx}
                 type="button"
-                whileHover={{ y: -4, scale: 1.03 }}
-                whileTap={{ scale: 0.96 }}
                 onClick={() => {
                   setSel(idx);
                   setErr(null);
                 }}
-                className={`group flex flex-col items-center gap-2 rounded-3xl border p-4 transition ${
-                  active
-                    ? "border-rose-300/60 bg-rose-400/15 shadow-glow-sm"
-                    : "border-white/10 bg-white/[0.04] hover:border-rose-200/30 hover:bg-white/[0.08]"
+                className={`flex w-full items-center gap-3 rounded-xl border p-3.5 text-left transition ${
+                  active ? "border-blush-400/50 bg-blush-500/10" : "border-white/10 hover:bg-white/[0.04]"
                 }`}
               >
-                <span
-                  className={`flex h-16 w-16 items-center justify-center rounded-full text-2xl font-bold text-white transition group-hover:animate-beat ${
-                    active
-                      ? "bg-gradient-to-br from-rose-400 to-fuchsia-500"
-                      : "bg-gradient-to-br from-white/15 to-white/5"
-                  }`}
-                >
-                  {name.trim().charAt(0).toUpperCase() || "❤"}
+                <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] font-display text-sm text-blush-100">
+                  {name.trim().charAt(0).toUpperCase() || "·"}
                 </span>
-                <span className="font-display text-sm text-rose-50/90">{name}</span>
-                <span className="text-[11px] text-rose-100/50">
-                  {active ? "¡Hola, mi amor! ✨" : "Toca si eres tú"}
+                <span className="flex-1">
+                  <span className="block text-sm text-blush-50">{name}</span>
+                  <Micro className="mt-0.5 block">Entrar como</Micro>
                 </span>
-              </motion.button>
+                <span className={`h-2 w-2 rounded-full transition ${active ? "bg-blush-400" : "bg-white/10"}`} />
+              </button>
             );
           })}
         </div>
 
-        <form onSubmit={submit} className="mt-6 space-y-4">
+        <form onSubmit={submit} className="mt-6">
           <div className="relative">
             <input
               type={show ? "text" : "password"}
               value={pass}
               onChange={(e) => setPass(e.target.value)}
-              placeholder="Nuestra contraseña secreta…"
+              placeholder="Contraseña"
               autoComplete="current-password"
               maxLength={128}
-              className="input-love pr-12"
+              className="input pr-16"
             />
             <button
               type="button"
               onClick={() => setShow((s) => !s)}
-              aria-label={show ? "Ocultar contraseña" : "Mostrar contraseña"}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-lg opacity-70 transition hover:opacity-100"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-semibold uppercase tracking-micro text-blush-300/60 transition hover:text-blush-200"
             >
-              {show ? "🙈" : "👀"}
+              {show ? "Ocultar" : "Ver"}
             </button>
           </div>
 
           {err && (
             <motion.p
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1, x: [0, -8, 8, -6, 6, 0] }}
-              transition={{ duration: 0.45 }}
-              className="text-center text-sm text-rose-300"
+              animate={{ opacity: 1, x: [0, -6, 6, -4, 4, 0] }}
+              className="mt-3 text-center text-xs text-blush-300"
             >
               {err}
             </motion.p>
           )}
           {locked && (
-            <p className="text-center text-sm text-amber-200">
-              Espera {lockSeconds}s para volver a intentar… respira, te amo. ⏳
-            </p>
+            <p className="mt-3 text-center text-xs text-blush-300/80">Espera {lockSeconds} segundos.</p>
           )}
 
-          <button type="submit" disabled={loading || locked} className="btn-love w-full">
-            {loading ? "Abriendo la puerta…" : "Abrir nuestro mundo 🔐"}
+          <button type="submit" disabled={loading || locked} className="btn mt-4 w-full">
+            {loading ? <Spinner className="h-4 w-4" /> : null} Entrar
           </button>
         </form>
 
         {devMode && (
-          <p className="mt-4 text-center text-[11px] text-rose-200/50">
-            Modo desarrollo · contraseña demo: <code>amor123</code>
+          <p className="mt-5 text-center text-[10px] text-blush-200/40">
+            Desarrollo · contraseña demo: amor123
           </p>
         )}
-        <p className="mt-4 text-center text-[11px] text-rose-200/40">
-          Cifrado y privado · hecho solo para nosotros
-        </p>
+        <Micro className="mt-5 block text-center text-blush-300/40">Cifrado en el servidor · solo nosotros</Micro>
       </motion.div>
     </main>
   );

@@ -15,35 +15,34 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+body {
+  background:
+    radial-gradient(1100px 600px at 80% -10%, rgba(221, 100, 133, 0.10), transparent 60%),
+    radial-gradient(800px 500px at -10% 40%, rgba(234, 138, 164, 0.07), transparent 60%),
+    #0b0509;
+  background-attachment: fixed;
+}
+
 button {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
 
-body {
-  background:
-    radial-gradient(1200px 700px at 85% -10%, rgba(192, 132, 252, 0.18), transparent 60%),
-    radial-gradient(900px 600px at -10% 30%, rgba(255, 107, 157, 0.16), transparent 60%),
-    radial-gradient(700px 500px at 50% 110%, rgba(251, 113, 133, 0.12), transparent 60%),
-    #0d0217;
-  background-attachment: fixed;
-}
-
 ::selection {
-  background: rgba(255, 107, 157, 0.45);
+  background: rgba(221, 100, 133, 0.4);
   color: #fff;
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 107, 157, 0.5) transparent;
+  scrollbar-color: rgba(221, 100, 133, 0.35) transparent;
 }
 *::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 *::-webkit-scrollbar-thumb {
-  background: rgba(255, 107, 157, 0.45);
+  background: rgba(221, 100, 133, 0.35);
   border-radius: 999px;
 }
 *::-webkit-scrollbar-track {
@@ -51,33 +50,57 @@ body {
 }
 
 @layer components {
-  .glass {
-    @apply rounded-3xl border border-white/10 bg-white/[0.06] backdrop-blur-xl;
+  /* Superficies */
+  .panel {
+    @apply rounded-2xl border border-white/[0.07] bg-white/[0.03];
   }
-  .glass-strong {
-    @apply rounded-3xl border border-white/15 bg-night-800/70 backdrop-blur-2xl;
+  .panel-strong {
+    @apply rounded-2xl border border-white/[0.09] bg-night-800/80 backdrop-blur-2xl shadow-panel;
+  }
+  .hairline {
+    @apply border-white/[0.07];
+  }
+
+  /* Tipografía */
+  .micro {
+    @apply text-[10px] font-semibold uppercase tracking-micro text-blush-300/70;
   }
   .text-grad {
-    background: linear-gradient(100deg, #ff8fb1, #ffd3a1 45%, #c084fc 90%);
+    background: linear-gradient(96deg, #f2b3c4, #fbe9ee 55%, #ea8aa4);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
-  .btn-love {
-    @apply relative inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-semibold text-white transition
-      bg-gradient-to-r from-rose-500 via-pink-500 to-fuchsia-500 bg-[length:200%_100%]
-      hover:bg-[position:100%_0] hover:shadow-glow active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
+
+  /* Controles */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-blush-500 px-6 py-3 text-sm font-semibold
+      text-white transition hover:bg-blush-400 hover:shadow-glow-sm active:scale-[0.98]
+      disabled:pointer-events-none disabled:opacity-40;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-white/10 px-5 py-2.5 text-sm
+      text-blush-100/80 transition hover:border-blush-300/40 hover:bg-white/[0.05] hover:text-white
+      active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40;
+  }
+  .input {
+    @apply w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-blush-50
+      placeholder-blush-200/30 outline-none transition focus:border-blush-300/50 focus:bg-white/[0.06];
   }
   .chip {
-    @apply inline-flex items-center gap-1.5 rounded-full border bg-gradient-to-r px-3 py-1 text-xs font-semibold backdrop-blur;
+    @apply inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1 text-[11px]
+      font-medium text-blush-100/70;
   }
-  .input-love {
-    @apply w-full rounded-2xl border border-white/15 bg-white/[0.07] px-5 py-3.5 text-rose-50 placeholder-rose-200/40
-      outline-none transition focus:border-rose-300/60 focus:bg-white/[0.1] focus:shadow-glow-sm;
+
+  /* Papel de cartas */
+  .paper {
+    background:
+      linear-gradient(180deg, #fdf9f5, #f8efe9);
+    color: #4b3540;
   }
 }
 
-/* Pétalos / corazones cayendo (CSS puro, liviano) */
+/* Pétalos sutiles */
 .petal {
   position: fixed;
   top: -6vh;
@@ -87,10 +110,9 @@ body {
   animation-name: fall;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
-  filter: drop-shadow(0 0 6px rgba(255, 107, 157, 0.4));
 }
 
-/* Destello que barre la tarjeta al pasar el mouse */
+/* Destello discreto en tarjetas */
 .shine {
   position: absolute;
   inset: 0;
@@ -107,17 +129,16 @@ body {
   height: 100%;
   width: 55%;
   transform: skewX(-20deg);
-  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.16), transparent);
-  transition: left 0.7s ease;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.07), transparent);
+  transition: left 0.8s ease;
 }
 .group:hover .shine::after {
   left: 130%;
 }
 
-/* Resaltado de coincidencias del buscador */
 mark {
-  background: rgba(255, 107, 157, 0.45);
+  background: rgba(221, 100, 133, 0.45);
   color: #fff;
-  border-radius: 4px;
+  border-radius: 3px;
   padding: 0 2px;
 }

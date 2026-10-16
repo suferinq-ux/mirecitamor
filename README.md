@@ -10,18 +10,19 @@ vivieron, escriben notas secretas y dejan que el destino elija la siguiente aven
 
 - 🔐 **Login para exactamente dos personas** — contraseñas hasheadas con `scrypt` en el servidor,
   sesión firmada con HMAC-SHA256 en cookie `httpOnly`.
-- 💯 **Las 100 citas** de su lista, con emoji, categoría y un tip romántico cada una.
+- 🧭 **Cinco apartados** — Inicio, Citas, Cartas, Fotos y Música; navegación lateral en
+  escritorio y barra inferior en el celular.
+- 💯 **Las 100 citas** de su lista con buscador instantáneo (ignora acentos), filtros por
+  estado y categoría, ruleta "Sorpréndeme" y notas privadas por cita.
   La cita **#100 es la cita mágica de plastilina** ✨.
-- 🔍 **Buscador instantáneo** (ignora acentos y mayúsculas) con resaltado de coincidencias,
-  filtros por estado y categoría con contadores, y diseño 100% responsive para celulares.
-- 🫀 **Animaciones 3D** — corazones extruidos en Three.js (react-three-fiber) que laten y flotan,
-  partículas, pétalos cayendo, explosiones de corazones al completar citas.
-- 💫 **Ruleta "Sorpréndeme"** — el destino elige la próxima cita entre las pendientes.
-- 📔 **Notas secretas** por cita + muro de "momentos vividos".
-- ☁️ **Progreso que no se pierde nunca**: vive en el servidor y se sincroniza entre
-  los dos dispositivos (recargas, navegadores distintos, celulares… siempre igual).
+- 💌 **Cartas de amor** entre ustedes, escritas sobre papel y guardadas en el servidor.
+- 📷 **Galería privada** — las fotos se comprimen en el navegador y no viven en ninguna nube ajena.
+- 🎵 **Nuestras canciones** — suban audio y suena con el reproductor integrado.
+- ☁️ **Todo sincronizado entre los dos** — progreso, cartas, fotos y música viven en el
+  servidor (archivo local en dev / Vercel KV en producción), no en el navegador.
 - 💞 Contador de **días juntos** (configurable por fecha de aniversario).
-- 📱 Progreso guardado **localmente en el dispositivo de cada uno** (privado, sin bases de datos).
+- 🫀 **3D refinado** — corazones de cristal extruidos en Three.js, tarjetas con inclinación
+  3D al pasar el cursor, pétalos sutiles.
 
 ## 🧰 Tecnologías
 
@@ -93,18 +94,22 @@ Con el `.env.local` incluido puedes entrar de inmediato:
 > ⚠️ Nunca subas tu `.env.local` a git ni copies los hashes demo a Vercel:
 > genera hashes y secreto nuevos para producción.
 
-## ☁️ Dónde vive el progreso
+## ☁️ Dónde vive todo
+
+Progreso, cartas, fotos y música se guardan en la **bóveda del servidor** (`src/lib/vault-store.ts`):
 
 | Entorno          | Almacenamiento                                        |
 | ---------------- | ----------------------------------------------------- |
-| Desarrollo local | Archivo `data/progress.json` (gitignoreado)           |
+| Desarrollo local | Archivos en `data/` (gitignoreado)                    |
 | Vercel           | **Upstash Redis (KV)** — ver abajo                    |
 | Sin KV en Vercel | Memoria de la instancia (⚠️ se pierde al redeplegar)  |
 
 **Para producción (recomendado, 1 minuto):** en Vercel → **Storage → Create Database →
 Upstash (Redis)** → conecta el database a tu proyecto. Vercel inyecta solo las variables
-`UPSTASH_REDIS_REST_URL` y `UPSTASH_REDIS_REST_TOKEN`. Con eso, las citas vividas por José
-y por Mireya quedan guardadas para siempre y sincronizadas entre sus celulares. 💞
+`UPSTASH_REDIS_REST_URL` y `UPSTASH_REDIS_REST_TOKEN`. Con eso, todo lo que José y Mireya
+vivan queda guardado para siempre y sincronizado entre sus celulares. 💞
+
+Límites de subida: 3.5 MB por archivo (las fotos se comprimen solas a ~300 KB en el navegador).
 
 ##  Seguridad implementada
 
@@ -122,19 +127,23 @@ y por Mireya quedan guardadas para siempre y sincronizadas entre sus celulares. 
 ```
 src/
   app/
-    page.tsx            → portada / login
-    amor/page.tsx       → panel privado (protegido)
-    api/login|logout    → autenticación serverless
-    middleware.ts       → candado del panel
+    page.tsx              → portada / login
+    amor/page.tsx         → panel privado (protegido por middleware)
+    api/login|logout      → autenticación
+    api/progress          → citas vividas (GET/PUT)
+    api/letters           → cartas (GET/POST/DELETE)
+    api/media, media/[id] → fotos y música (subida, listado, bytes)
   components/
-    Scene3D.tsx         → corazones 3D (Three.js)
-    LoginForm.tsx       → acceso de dos llaves
-    Dashboard.tsx       → las 100 citas, ruleta, momentos
-    Petals.tsx          → lluvia de pétalos
+    Scene3D.tsx           → corazones de cristal (Three.js)
+    LoginForm.tsx         → acceso de dos llaves
+    Dashboard.tsx         → shell con los cinco apartados
+    ui.tsx                → iconos SVG, modales, tilt 3D
+    sections/             → Home, Dates, Letters, Gallery, Music
   lib/
-    dates.ts            → las 100 citas 💌
-    auth.ts / session.ts / store.ts
-scripts/                → generadores de hash y secreto
+    dates.ts              → las 100 citas 💌
+    auth.ts · session.ts  → scrypt + HMAC
+    vault-store.ts        → bóveda (KV / archivo / memoria)
+scripts/                  → generadores de hash y secreto
 ```
 
 Hecho con amor infinito. 💞

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Playfair_Display, Dancing_Script, Nunito } from "next/font/google";
+import { Playfair_Display, Dancing_Script, Inter } from "next/font/google";
 import "./globals.css";
 
 const display = Playfair_Display({
@@ -12,7 +12,7 @@ const script = Dancing_Script({
   variable: "--font-script",
   display: "swap"
 });
-const body = Nunito({
+const body = Inter({
   subsets: ["latin"],
   variable: "--font-body",
   display: "swap"
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#150425"
+  themeColor: "#0b0509"
 };
 
 export default function RootLayout({
@@ -39,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${display.variable} ${script.variable} ${body.variable} font-body bg-night-900 text-rose-50 antialiased`}
+        className={`${display.variable} ${script.variable} ${body.variable} font-body bg-night-950 text-blush-50 antialiased`}
       >
         {children}
       </body>

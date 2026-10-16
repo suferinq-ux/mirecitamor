@@ -17,7 +17,6 @@ export default async function AmorPage() {
 
   return (
     <Dashboard
-      userIndex={session.u}
       userName={session.n}
       names={names}
       anniversary={process.env.NEXT_PUBLIC_ANNIVERSARY || null}

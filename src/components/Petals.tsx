@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 
-const GLYPHS = ["💗", "🌸", "", "🩷", "✧"];
+const GLYPHS = ["❀", "✿"];
 
 interface Petal {
   left: number;
@@ -13,23 +13,23 @@ interface Petal {
   opacity: number;
 }
 
-/** Lluvia suave de pétalos y corazoncitos (CSS puro). */
-export default function Petals({ count = 14 }: { count?: number }) {
+/** Lluvia muy sutil de pétalos, casi imperceptible: textura, no ruido. */
+export default function Petals({ count = 8 }: { count?: number }) {
   const petals = useMemo<Petal[]>(
     () =>
       Array.from({ length: count }, (_, i) => ({
-        left: (i * 97 + 13) % 100,
-        delay: -((i * 3.7) % 18),
-        duration: 12 + ((i * 2.3) % 10),
-        size: 12 + ((i * 7) % 14),
+        left: (i * 89 + 17) % 100,
+        delay: -((i * 4.3) % 26),
+        duration: 22 + ((i * 3.1) % 14),
+        size: 9 + ((i * 5) % 8),
         glyph: GLYPHS[i % GLYPHS.length],
-        opacity: 0.25 + ((i * 13) % 40) / 100
+        opacity: 0.08 + ((i * 11) % 14) / 100
       })),
     [count]
   );
 
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+    <div aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden text-blush-300">
       {petals.map((p, i) => (
         <span
           key={i}
