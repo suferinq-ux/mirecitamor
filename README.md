@@ -18,6 +18,8 @@ vivieron, escriben notas secretas y dejan que el destino elija la siguiente aven
   partículas, pétalos cayendo, explosiones de corazones al completar citas.
 - 💫 **Ruleta "Sorpréndeme"** — el destino elige la próxima cita entre las pendientes.
 - 📔 **Notas secretas** por cita + muro de "momentos vividos".
+- ☁️ **Progreso que no se pierde nunca**: vive en el servidor y se sincroniza entre
+  los dos dispositivos (recargas, navegadores distintos, celulares… siempre igual).
 - 💞 Contador de **días juntos** (configurable por fecha de aniversario).
 - 📱 Progreso guardado **localmente en el dispositivo de cada uno** (privado, sin bases de datos).
 
@@ -91,7 +93,20 @@ Con el `.env.local` incluido puedes entrar de inmediato:
 > ⚠️ Nunca subas tu `.env.local` a git ni copies los hashes demo a Vercel:
 > genera hashes y secreto nuevos para producción.
 
-## 🔒 Seguridad implementada
+## ☁️ Dónde vive el progreso
+
+| Entorno          | Almacenamiento                                        |
+| ---------------- | ----------------------------------------------------- |
+| Desarrollo local | Archivo `data/progress.json` (gitignoreado)           |
+| Vercel           | **Upstash Redis (KV)** — ver abajo                    |
+| Sin KV en Vercel | Memoria de la instancia (⚠️ se pierde al redeplegar)  |
+
+**Para producción (recomendado, 1 minuto):** en Vercel → **Storage → Create Database →
+Upstash (Redis)** → conecta el database a tu proyecto. Vercel inyecta solo las variables
+`UPSTASH_REDIS_REST_URL` y `UPSTASH_REDIS_REST_TOKEN`. Con eso, las citas vividas por José
+y por Mireya quedan guardadas para siempre y sincronizadas entre sus celulares. 💞
+
+##  Seguridad implementada
 
 - Contraseñas **nunca en texto plano**: hash `scrypt` (N=16384) comparado con `timingSafeEqual`.
 - Sesión = cookie `httpOnly` + `Secure` + `SameSite=Strict`, firmada con **HMAC-SHA256** y expiración.

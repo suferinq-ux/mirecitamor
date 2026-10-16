@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Scene3D from "./Scene3D";
 import Petals from "./Petals";
 import { CATEGORIES, DATES, type Category, type DateIdea } from "@/lib/dates";
-import { loadProgress, saveProgress, type Progress } from "@/lib/store";
+import { loadProgress, saveProgress, loadRemote, saveRemote } from "@/lib/store";
+import type { Progress } from "@/lib/progress";
 
 const pad = (n: number) => String(n).padStart(3, "0");
 const fmtDate = (iso: string) =>
@@ -363,21 +364,37 @@ export default function Dashboard({ userName, names, anniversary }: Props) {
   const [selected, setSelected] = useState<DateIdea | null>(null);
   const [randomOpen, setRandomOpen] = useState(false);
   const [burst, setBurst] = useState(0);
+  const progressRef = useRef<Progress>({});
 
   useEffect(() => {
-    setProgress(loadProgress());
+    const local = loadProgress();
+    progressRef.current = local;
+    setProgress(local);
     setMounted(true);
+    // El servidor es la fuente de la verdad: combina y sincroniza.
+    (async () => {
+      const remote = await loadRemote();
+      if (!remote) return;
+      const merged: Progress = { ...local, ...remote };
+      progressRef.current = merged;
+      setProgress(merged);
+      saveProgress(merged);
+      if (Object.keys(merged).length !== Object.keys(remote).length) {
+        void saveRemote(merged);
+      }
+    })();
   }, []);
 
-  const update = (fn: (p: Progress) => Progress) =>
-    setProgress((prev) => {
-      const next = fn(prev);
-      saveProgress(next);
-      return next;
-    });
+  const update = (fn: (p: Progress) => Progress) => {
+    const next = fn(progressRef.current);
+    progressRef.current = next;
+    setProgress(next);
+    saveProgress(next);
+    void saveRemote(next);
+  };
 
   const toggle = (d: DateIdea) => {
-    const wasDone = !!progress[d.id];
+    const wasDone = !!progressRef.current[d.id];
     update((p) => {
       const next = { ...p };
       if (next[d.id]) delete next[d.id];
